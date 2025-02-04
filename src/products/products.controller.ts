@@ -10,33 +10,43 @@ import {
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { IProductController } from './interfaces/product.controller.interface';
+import { ProductEntity } from './entities/product.entity';
+import { IdParam, SlugParam } from './dto/params.dto';
 
-@Controller('products')
-export class ProductsController {
+@Controller('v2/products')
+export class ProductsController implements IProductController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
+  async createProduct(@Body() dto: CreateProductDto) {
+    return await this.productsService.createProduct(dto);
   }
 
   @Get()
-  findAll() {
-    return this.productsService.findAll();
+  async findProductList() {
+    return await this.productsService.findProductList();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productsService.findOne(+id);
+  async findProductById(@Param('id') id: IdParam) {
+    return await this.productsService.findProductById(id);
+  }
+  @Get('slug/:id')
+  async findProductBySlug(slug: SlugParam): Promise<ProductEntity | string> {
+    return await this.productsService.findProductBySlug(slug);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(+id, updateProductDto);
+  async updateProductById(
+    @Param('id') id: IdParam,
+    @Body() dto: UpdateProductDto,
+  ) {
+    return await this.productsService.updateProductById(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(+id);
+  async deleteProductById(@Param('id') id: IdParam) {
+    return await this.productsService.deleteProductById(id);
   }
 }
